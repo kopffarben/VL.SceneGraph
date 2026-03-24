@@ -121,6 +121,7 @@ Für Projection-Painting-Performances (z.B. Augustinerkloster Erfurt):
 | **[06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md)** | NodeFactories, VL-Integration, Undo-System, ImGui-Compositor-UI |
 | **[07-PROJEKTSTRUKTUR.md](architecture/07-PROJEKTSTRUKTUR.md)** | Source Generators, Verzeichnis-Layout, NuGet, Offene Punkte, Performance-Ziele |
 | **[08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md)** | Layout-Engine (Flexbox), LayoutConfig, ComputedLayout, InputRouting, Hit-Testing, IMeasurable |
+| **[09-STRIDE-INTEGRATION.md](architecture/09-STRIDE-INTEGRATION.md)** | ClipOutput, TextureCompositor, Scene3DCompositor, Compute, PostFX, Mapping, Output Sinks, GPU Lifecycle |
 | **[OFFENE-FRAGEN.md](OFFENE-FRAGEN.md)** | Offene Design-Fragen, Brainstorming-Backlog, nächste Schritte |
 
 ---

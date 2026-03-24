@@ -310,6 +310,151 @@ public static class InputRoutingPass
 
 ---
 
+## LayoutConfig API-Design
+
+Die `LayoutConfig` Component wird nicht direkt mit Flexbox-Properties konstruiert, sondern ueber **Factory-Methoden**, die gaengige Layout-Patterns auf Flexbox abbilden. Der User muss Flexbox nicht verstehen.
+
+### Factory-Methoden
+
+```csharp
+public static LayoutConfig Stack(StackDirection direction = Vertical, float gap = 0, Alignment align = Stretch)
+public static LayoutConfig Fill(Thickness margin = default)
+public static LayoutConfig DockTop(SizeValue height, Thickness margin = default)
+public static LayoutConfig DockBottom(SizeValue height, Thickness margin = default)
+public static LayoutConfig DockLeft(SizeValue width, Thickness margin = default)
+public static LayoutConfig DockRight(SizeValue width, Thickness margin = default)
+public static LayoutConfig Grid(int columns, float gap = 0, float rowGap = 0)
+public static LayoutConfig GridChild(int column = 0, int row = 0, int colSpan = 1, int rowSpan = 1)
+public static LayoutConfig Centered(SizeValue width = default, SizeValue height = default)
+public static LayoutConfig Absolute(float x, float y, SizeValue width = default, SizeValue height = default)
+public static LayoutConfig Hidden()
+public static LayoutConfig Custom(...)  // Direct Flex access
+```
+
+### SizeValue (aktualisiert)
+
+```csharp
+public readonly record struct SizeValue(float Value, SizeUnit Unit)
+{
+    public static readonly SizeValue Auto = new(0, SizeUnit.Auto);
+    public static SizeValue Px(float pixels) => new(pixels, SizeUnit.Pixels);
+    public static SizeValue Pct(float percent) => new(percent, SizeUnit.Percent);
+    public static SizeValue Fr(float fraction) => new(fraction, SizeUnit.Fraction);
+    public static implicit operator SizeValue(float pixels) => Px(pixels);
+}
+
+public enum SizeUnit : byte { Auto, Pixels, Percent, Fraction }
+```
+
+Der `implicit operator` erlaubt `DockTop(60)` statt `DockTop(SizeValue.Px(60))`.
+
+### Mapping-Tabelle: Factory → Flexbox
+
+| Factory | FlexDirection | FlexGrow | FlexShrink | FlexWrap | Width | Height | PositionType |
+|---------|--------------|----------|------------|----------|-------|--------|-------------|
+| Stack(V) | Column | 0 | 0 | NoWrap | Auto | Auto | Relative |
+| Stack(H) | Row | 0 | 0 | NoWrap | Auto | Auto | Relative |
+| Fill | - | 1 | 1 | - | 100% | 100% | Relative |
+| DockTop | - | 0 | 0 | - | 100% | fixed | Relative |
+| Grid | Row | 0 | 0 | Wrap | Auto | Auto | Relative |
+| Centered | - | 0 | 0 | - | param | param | Relative |
+| Absolute | - | 0 | 0 | - | param | param | **Absolute** |
+| Hidden | - | - | - | - | - | - | Display.None |
+
+### Dock-Pattern
+
+Docking funktioniert ueber die **Reihenfolge der Kinder** in einem Parent-Stack, **nicht** ueber `position: absolute`. Ein `DockTop`-Kind bekommt `FlexGrow: 0` und eine feste Hoehe, ein `Fill`-Kind bekommt `FlexGrow: 1` und fuellt den Rest. Die Anordnung ergibt sich aus der Kind-Reihenfolge im Baum:
+
+```
+Stack(Vertical)
+  DockTop(60)      -> FlexGrow: 0, Height: 60px
+  Fill()           -> FlexGrow: 1 (fuellt den Rest)
+  DockBottom(80)   -> FlexGrow: 0, Height: 80px
+```
+
+### Grid via FlexWrap
+
+Grid wird ueber `FlexWrap.Wrap` realisiert. Der `FlexLayoutEngine` berechnet die Kind-Breite automatisch: `100% / columns - gap`. Beispiel: `Grid(3, gap: 8)` ergibt Kinder mit `width: calc(33.33% - 8px)`. Der User gibt nur Spaltenanzahl und Gap an.
+
+### Gap-Simulation
+
+Flexbox hat kein natives `gap`-Property. Der `FlexLayoutEngine` simuliert Gap durch **halben Gap als Margin** auf jedes Kind (`margin-left: gap/2, margin-right: gap/2`). Am Rand wird negativer Margin auf dem Container verwendet, damit das erste und letzte Kind buendig abschliessen.
+
+### SizeUnit.Fraction
+
+Flexbox kennt kein `fr`-Unit. Der `FlexLayoutEngine` rechnet Fraktionen in Prozent um basierend auf der Summe aller Geschwister-Fraktionen. Beispiel: Drei Kinder mit `Fr(1)`, `Fr(2)`, `Fr(1)` ergeben 25%, 50%, 25%.
+
+### ScrollConfig Component
+
+```csharp
+[SceneComponent]
+public partial record ScrollConfig(
+    ScrollDirection Direction,
+    bool ShowScrollbar,
+    float ScrollPosition,
+    float ScrollVelocity,
+    bool SnapToChildren);
+
+[SceneComponent(Transient = true)]
+public partial record ComputedScroll(
+    Vector2 ContentSize,
+    Vector2 ViewportSize,
+    Vector2 ScrollOffset,
+    float ScrollProgress);
+```
+
+`ScrollConfig` ist eine eigene Component (kein Feld in `LayoutConfig`), weil nicht jeder Layout-Node scrollbar ist. `ComputedScroll` wird vom `LayoutPass` geschrieben wenn `Overflow.Scroll` aktiv ist — die eigentliche Offset-Berechnung erfolgt extern (Input-getrieben).
+
+### Flexbox API-Verifizierung
+
+Uebersicht welche Features nativ in der Flexbox-Engine verfuegbar sind und welche der `FlexLayoutEngine` zusaetzlich implementiert:
+
+| Feature | Flexbox-API | Status |
+|---------|------------|--------|
+| FlexDirection | StyleSetFlexDirection() | ✅ Nativ |
+| FlexWrap | StyleSetFlexWrap() | ✅ Nativ |
+| FlexGrow/Shrink | StyleSetFlexGrow/Shrink() | ✅ Nativ |
+| Width/Height (Px) | StyleSetWidth/Height(float) | ✅ Nativ (Unit.Point) |
+| Width/Height (%) | StyleSetWidthPercent(float) | ✅ Nativ |
+| Width/Height (Auto) | StyleSetWidthAuto() | ✅ Nativ |
+| AspectRatio | StyleSetAspectRatio(float) | ✅ Nativ |
+| Position Absolute | StyleSetPositionType() | ✅ Nativ |
+| Margin/Padding | StyleSetMargin/Padding(Edge, float) | ✅ Nativ |
+| Overflow | StyleSetOverflow(Overflow) | ✅ Nativ |
+| MeasureFunc | node.SetMeasureFunction() | ✅ Nativ |
+| Display.None | Display.None | ✅ Nativ |
+| Gap/RowGap | - | ⚠️ Via Margin simuliert |
+| SizeUnit.Fraction | - | ⚠️ Via Percent umgerechnet |
+| Scroll-Verhalten | Overflow.Scroll (nur Layout) | ⚠️ Offset-Berechnung extern |
+| MeasureMode | Flexbox: Undefined=0, Exactly=1, AtMost=2 | ⚠️ Flexbox-Enum direkt verwenden |
+
+### Beispiel: Touch-App Layout (mit Factories)
+
+```
+[Page "TouchApp"]
+  LayoutConfig: Stack(Vertical)
+
+  [Header "TopBar"]
+    LayoutConfig: DockTop(60)
+
+  [Content "Main"]
+    LayoutConfig: Fill()
+
+    [Grid "CardGrid"]
+      LayoutConfig: Grid(columns: 3, gap: 8)
+
+      [Card "card_001"]
+        LayoutConfig: GridChild(column: 0, row: 0)
+
+      [Card "card_002"]
+        LayoutConfig: GridChild(column: 1, row: 0)
+
+  [Footer "NavBar"]
+    LayoutConfig: DockBottom(80)
+```
+
+---
+
 ## Zusammenspiel Layout, Input und Clip-Evaluation
 
 Die neuen Passes fuegen sich zwischen `ConstraintSolver` und `StreamRouting` in die bestehende Frame-Pipeline ein:

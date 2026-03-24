@@ -6,11 +6,7 @@
 
 ## Priorität: Hoch
 
-### LayoutConfig API-Design
-- Wie mappt LayoutConfig auf Flexbox-Properties für den VL-User? (Node-Browser-Darstellung)
-- Brauchen wir Convenience-Factories? z.B. `LayoutConfig.Stack(Vertical, Gap: 8)`, `LayoutConfig.Fill()`
-- Wie geht Dock-Layout genau? (Ist das echtes Docking oder absolute Positionierung?)
-- Scroll-Verhalten: Wie interagiert Scrolling mit dem InputRoutingPass?
+*(Aktuell keine offenen Fragen mit hoher Priorität.)*
 
 ---
 
@@ -110,3 +106,10 @@
 | Channel-Write API | Kein hub.Write() — stattdessen channel.Object = value auf gecachten Referenzen | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
 | MIDI/OSC Dependencies | NAudio für MIDI, OscCore für OSC — nicht in VL.StandardLibs | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
 | Pen/Stylus | Nicht in VL — WM_POINTER Custom Wrapper nötig | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| LayoutConfig Factory-API | 10 Factories (Stack, Fill, Dock*, Grid, Centered, Absolute, Hidden, Custom) | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
+| SizeValue mit 4 Units | Auto, Px, Pct, Fr — Fr wird zu Percent umgerechnet | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
+| Dock via Flex-Order | FlexGrow:0 + fixe Groesse, NICHT position:absolute | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
+| Grid via FlexWrap | FlexWrap.Wrap + berechnete Kind-Breite | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
+| Gap-Simulation | Via Margin auf Children, kein natives Flexbox-Gap | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
+| ScrollConfig Component | ScrollDirection, ScrollPosition, ComputedScroll (Transient) | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
+| Flexbox API verifiziert | 14 Features nativ, 5 Anpassungen, 3 extern geloest | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |

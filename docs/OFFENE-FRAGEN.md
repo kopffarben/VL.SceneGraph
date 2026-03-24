@@ -18,17 +18,6 @@
 - Wo werden GPU-Resources (Textures, Buffers) alloziert/freigegeben im Clip-Lifecycle?
 - Wie funktioniert die Texture-Composition in Stride (RenderTarget-Ping-Pong, Compute, etc.)?
 
-### ImGui-UI: Kompatibilität mit VL.ImGui
-- Die Compositor-UI (Layer-Stack, Timeline, Inspector, Transport) soll mit VL.ImGui gebaut werden
-- VL.ImGui lebt im Immediate-Mode-Paradigma — wie integriert sich das mit unserem immutablen SceneGraph?
-- Die UI soll **im Live-Patch leben können** — der User kann die UI neben seinem Content-Patch sehen und nutzen
-- Wie fließen UI-Interaktionen (Slider-Drag, Clip-Reorder, Keyframe-Editing) als SceneEdits zurück?
-- Brauchen wir eine Abstraktionsschicht zwischen ImGui-Widgets und SceneGraph-Operationen?
-- Wie handhabt die UI gleichzeitig den immutablen Graph (Daten anzeigen) und SceneEdits (Daten ändern)?
-- Performance: ImGui bei vielen Clips in der Timeline — Culling/Virtualisierung nötig?
-- Können User eigene Inspector-Widgets pro Component-Typ registrieren?
-- Wie integriert sich die UI mit VLs Editor (Fenster-Management, Docking)?
-
 ### LayoutConfig API-Design
 - Wie mappt LayoutConfig auf Flexbox-Properties für den VL-User? (Node-Browser-Darstellung)
 - Brauchen wir Convenience-Factories? z.B. `LayoutConfig.Stack(Vertical, Gap: 8)`, `LayoutConfig.Fill()`
@@ -44,11 +33,6 @@
 - Parsing → AST → Kompilation?
 - Performance: Pro Frame evaluiert oder gecacht?
 - Welche Variablen/Funktionen sind verfügbar?
-
-### StateMachine-Crossfading
-- Wie genau überblendet man zwischen States wenn verschiedene Clips aktiv/inaktiv werden?
-- Crossfade-Duration und -Kurve pro Transition?
-- Was passiert wenn ein State gewechselt wird während ein Crossfade läuft?
 
 ### Netzwerk / Multi-Machine
 - Synchronisierung für große Installationen mit mehreren Rechnern
@@ -104,3 +88,20 @@
 | Layout: Interface vs. Component | Option C: Layout via Components, kein Interface-Gate | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
 | Layout-Engine | Flexbox Pure C# Port, direkt migriert | [08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md) |
 | Paketstruktur | Modulare Pakete: Kern + Layout + Input + Compositor | [07-PROJEKTSTRUKTUR.md](architecture/07-PROJEKTSTRUKTUR.md) |
+| ImGui-UI Architektur | Widgets erben von VL.ImGui Widget, lesen Graph als Property, schreiben Commands in UndoRedoStack | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Undo/Redo System | Globaler UndoRedoStack, ISceneCommand mit Do/Undo, In-Flight Pattern für Drags, MacroCommand für Batch | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Inspector / ObjectEditor | SceneComponentEditorFactory für C# Records, ChainedEditorFactory, VLs WidgetType-Attribute | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Custom Component-Editors | IObjectEditorFactory Chain: User Custom → SceneComponentEditorFactory → VL Default | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Edit-Flow | UndoRedoStack ist der zentrale Edit-Hub, FlushPendingEdits() für Accumulator | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Shortcuts | T3-Pattern: CompositorActions Enum + KeyMap + action.Triggered(), JSON-konfigurierbar | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| VL-Editor Integration | SessionNodes.ShowPatchOfNode(UniqueId) für "Open Patch" / "Show in Parent Patch" | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Context-Menüs | ImGuis eingebaute Popups, IContextMenuContributor für Erweiterbarkeit | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| NodeBrowser | TypeRegistry Discovery, Slot-Validierung als Warning (nicht Filter), Drag&Drop | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| Custom Windows | VL.ImGui Window() + DockSpace, User patcht Widget → dockt sich automatisch ein | [06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md) |
+| HFSM-Design | Selbst gebaut, hierarchisch, Crossfading mit TransitionProgress, Parallel-States | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |
+| FSM-TimeControl | StateDefinition.OnEnterTimeControl steuert Timeline-Playhead (GotoTime, Rate, Mode) | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |
+| Timeline↔FSM bidirektional | Cues triggern FSM, FSM steuert Playhead — alles über SceneEdits | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |
+| Cue Threshold-Crossing | PreviousLocalTime in TimeContext, Crossing-Check statt Wertvergleich | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |
+| Ghost-Preview | Transparente Ghost-Blöcke für mögliche FSM-Transitions am Playhead | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |
+| Generative Timeline | ActivityLogger + authored/generated Clips in derselben Timeline | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |
+| Nested FSM Crossfade | Current + Incoming evaluieren, Outgoing einfrieren (History) | [04-ZEIT-UND-STEUERUNG.md](architecture/04-ZEIT-UND-STEUERUNG.md) |

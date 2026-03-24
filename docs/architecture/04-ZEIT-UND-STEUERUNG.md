@@ -52,9 +52,10 @@ Der Solver fuehrt Constraints in topologisch sortierter Reihenfolge aus. Nach je
 Jeder Node kann seine eigene Zeitbasis haben oder die des Parents erben:
 
 ```csharp
-[SceneComponent(FlatStorage = true)]
+[SceneComponent(Transient = true, FlatStorage = true)]
 public partial record TimeContext(
     float LocalTime,
+    float PreviousLocalTime,     // Für Cue Threshold-Crossing Detection
     float LocalDuration,
     float PlaybackRate,
     TimeMode Mode,
@@ -134,6 +135,36 @@ public enum CueAction : byte
 }
 ```
 
+#### Cue-Evaluation: Threshold-Crossing
+
+Cues werden nicht bei "aktuellem Wert >= CueTime" ausgelöst, sondern bei **Crossing**:
+
+```csharp
+bool HasCrossed(float prevTime, float currTime, float cueTime)
+{
+    if (prevTime < cueTime && currTime >= cueTime) return true;  // Vorwärts
+    if (prevTime > cueTime && currTime <= cueTime) return true;  // Rückwärts
+    return false;
+}
+```
+
+TimePass setzt `PreviousLocalTime = LocalTime` am Framestart, berechnet dann neues `LocalTime`. CueEvaluator vergleicht beide Werte.
+
+#### Cues triggern FSM-Transitions
+
+```csharp
+public enum CueAction : byte
+{
+    Play, Stop, Pause, Resume, FadeIn, FadeOut,
+    GotoAndPlay, GotoAndStop, Trigger,
+    TriggerTransition    // Löst FSM-Transition aus → SceneEdit
+}
+```
+
+Timeline → FSM: Cue mit TriggerTransition erzeugt `TriggerTransition` SceneEdit.
+FSM → Timeline: StateDefinition.OnEnterTimeControl erzeugt TimeContext SceneEdit.
+Bidirektional, alles über SceneEdits.
+
 ---
 
 ## StateMachine-System
@@ -197,6 +228,88 @@ Zwei grundlegend verschiedene Arbeitsweisen:
 - **Generative/Live Timeline**: Die FSM trifft Entscheidungen zur Laufzeit. Ein `ActivityLogger` zeichnet auf, was wann passiert. Die Timeline-UI zeigt eine scrollbare History der vergangenen Zustandswechsel.
 
 Beide Modi koennen kombiniert werden: Eine authored Basis-Timeline mit generativen Verzweigungen via FSM.
+
+### Hierarchische StateMachine (HFSM)
+
+States können verschachtelte Sub-StateMachines enthalten:
+
+```csharp
+public record StateDefinition(
+    string Id,
+    string Name,
+    ImmutableArray<string> ActiveChildIds,
+    ImmutableArray<NodeHandle> ActiveClipHandles,
+    ImmutableDictionary<string, ImmutableDictionary<string, object?>> ClipParameterOverrides,
+    float MinDuration,
+    ImmutableArray<string> OnEnterChannels,
+    ImmutableArray<string> OnExitChannels,
+    StateMachineDefinition? SubStateMachine,
+    StateKind Kind,
+    TimeControl? OnEnterTimeControl);
+
+public enum StateKind : byte
+{
+    Normal, Initial, Final,
+    Parallel,        // Kinder-States laufen parallel
+    History,         // Merkt sich letzten Sub-State
+    ShallowHistory   // Merkt sich nur oberste Ebene
+}
+```
+
+#### TimeControl — FSM steuert Timeline-Playhead
+
+```csharp
+public record TimeControl(
+    float? GotoTime,
+    float? PlaybackRate,
+    TimeMode? SetTimeMode,
+    TimeControlTarget Target);
+
+public enum TimeControlTarget : byte
+{
+    Self,    // TimeContext des FSM-Nodes
+    Parent,  // TimeContext des Parent-Nodes
+    Root     // Master-Timeline
+}
+```
+
+Bei State-Eintritt: FSM erzeugt SceneEdits für TimeContext-Änderungen. Der Accumulator appliziert sie VOR dem TimePass — kein Race-Condition.
+
+#### Wildcard-Transitions
+
+`"*"` als FromStateId matcht jeden aktuellen State. Priorität: Spezifische Transitions vor Wildcards, dann nach Priority-Feld.
+
+#### Crossfade und verschachtelte FSMs
+
+Während eines Crossfade A→B:
+- State A (outgoing): Sub-FSM läuft WEITER, Activity *= (1 - progress)
+- State B (incoming): Sub-FSM STARTET von InitialState, Activity *= progress
+- Nach Crossfade-Ende: State A's Sub-FSM wird eingefroren (nicht gelöscht — History)
+
+#### Laufzeit-State (erweitert)
+
+```csharp
+[SceneComponent(Transient = true, FlatStorage = true)]
+public partial record StateMachineState(
+    string CurrentStateId,
+    float TimeInState,
+    string? TransitionId,
+    string? FromStateId,
+    string? ToStateId,
+    float TransitionProgress,
+    ImmutableDictionary<string, StateMachineState>? SubStates,
+    ImmutableArray<string> ActiveParallelStates,
+    ImmutableDictionary<string, string>? StateHistory,
+    ImmutableDictionary<string, int> ChannelRevisions);
+```
+
+`ChannelRevisions` trackt die letzte bekannte Revision jedes überwachten Channels — für zuverlässige Bang-Detection im frame-basierten System.
+
+#### FSM-Platzierung im Baum
+
+Zwei Optionen (User wählt):
+- **Group-Component**: StateMachineDefinition auf einem Group-Node, kontrolliert Kinder (ActiveChildIds)
+- **Logic-Node**: Standalone Logic-Node mit StateMachineDefinition, kontrolliert beliebige Nodes via Edges (ActiveClipHandles)
 
 ---
 
@@ -330,3 +443,63 @@ Recordings werden in einem binaeren Format mit der Endung `.vlrc` gespeichert. K
 - Delta-Encoding fuer Timestamps (float-Differenzen statt Absolutwerte)
 - Delta-Encoding fuer Stroke-Punkte (Positionsdifferenzen)
 - Kompakte Speicherung ermoeglicht schnelles Laden und Streaming
+
+---
+
+## Generative Timeline und Ghost-Preview
+
+### Authored vs. Generative Clips
+
+| Typ | Farbe | Editierbar | Quelle |
+|-----|-------|------------|--------|
+| Timeline-authored | Blau | Ja (draggable, resizable) | User platziert manuell |
+| FSM-generated | Grün (schraffiert) | Nein (read-only, Aufzeichnung) | FSM-State-Aktivierung |
+| AlwaysOn | Grau | Nein | ControlMode.AlwaysOn |
+| Crossfade | Gelb-Gradient | Nein | Transition in progress |
+
+### ActivityLogger
+
+```csharp
+[SceneComponent(Transient = true)]
+public partial record ActivityLog(
+    ImmutableArray<ActivityLogEntry> Entries,
+    float OldestEntryTime,
+    float NewestEntryTime);
+
+public record ActivityLogEntry(
+    string ClipId,
+    float StartTime,
+    float EndTime,
+    float PeakActivity,
+    string? TriggeredByState,
+    string? TriggeredByTransition);
+```
+
+Timeline zeigt das Log rückblickend (scrollbar). User kann aus generierten Blöcken authored Clips machen: "Convert to Timeline Clip" ändert ControlMode und erstellt ClipLifetime.
+
+### Ghost-Preview für FSM-Transitions
+
+Am Playhead zeigt die Timeline alle möglichen nächsten States als transparente Ghost-Blöcke:
+
+- **Zeitbasierte Transitions** (AfterDuration): Ghost positioniert sich an der geschätzten Trigger-Zeit, mit Progress-Bar
+- **Event-basierte Transitions** (Manual, Channel, Beat): Ghost schwebt rechts neben dem Playhead
+- **Condition-Label**: "After 60s (45s/60s)", "Manual", "Channel: OSC/ShowControl/Next"
+- **Ghost-Clips**: Welche Clips im Ghost-State aktiv wären (noch transparenter)
+- **Bei Trigger**: Ghost verschwindet, wird zum realen Crossfade-Block
+- **Klickbar**: User kann Ghost-Transition manuell triggern
+
+### Timeline-Modi (erweitert)
+
+```csharp
+public enum TimelineViewMode : byte
+{
+    Clips,       // Clip-Blöcke (authored + generated)
+    Keyframes,   // Kurven-Editor für selektierten Clip
+    Activity,    // Activity-Verläufe aller Clips
+    States       // FSM-State-Lanes + Ghost-Preview
+}
+```
+
+### Breadcrumb-Navigation
+
+Doppelklick auf einen hierarchischen State → Timeline zoomt in die Sub-Timeline. Breadcrumb zeigt den Pfad: `Show > Akt1 > Szene_B`. Escape oder Breadcrumb-Klick navigiert zurück.

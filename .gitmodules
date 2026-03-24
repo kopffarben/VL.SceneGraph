@@ -5,3 +5,6 @@
 [submodule "src/References/Flexbox"]
 	path = src/References/Flexbox
 	url = https://github.com/ru-ace/Flexbox.git
+[submodule "src/References/tixl"]
+	path = src/References/tixl
+	url = https://github.com/tixl3d/tixl

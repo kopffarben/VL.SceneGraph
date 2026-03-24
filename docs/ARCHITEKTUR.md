@@ -101,6 +101,11 @@ Für Projection-Painting-Performances (z.B. Augustinerkloster Erfurt):
 - **Source Generators + NodeFactories**: Eliminieren Boilerplate, nutzen VLs csproj-Hot-Reload
 - **Hotswap via VL.Core**: `IHotSwappableEntryPoint.OnSwap` für nahtlosen Patch-Reload bei laufender Show
 - **PersistentId für stabile Referenzen**: VLs PersistentId überlebt Umbenennungen — Schema-Migration ohne Datenverlust
+- **Drei State-Typen**: Persistent (Components), Transient (Components mit Transient=true, nicht serialisiert), Clip-intern (VL Process Felder)
+- **VL Channels für Events**: IChannelHub als System-Pin — Low-Frequency Events und Inter-Clip-Kommunikation über VLs bestehendes Channel-System
+- **Layout via Components (Option C)**: LayoutConfig ist eine optionale Component, kein Interface-Gate — Compositor-Nodes ohne Layout haben zero Overhead
+- **Flexbox Layout-Engine**: Pure C# Port von Yoga (~6000 Zeilen), direkt migriert, hinter ILayoutEngine Interface austauschbar
+- **Modulare Pakete**: Kern (VL.SceneGraph) bleibt schlank, Layout/Input/Compositor als optionale Erweiterungspakete
 
 ---
 
@@ -115,6 +120,8 @@ Für Projection-Painting-Performances (z.B. Augustinerkloster Erfurt):
 | **[05-SERIALISIERUNG.md](architecture/05-SERIALISIERUNG.md)** | Show-Datei, PatchRegistry, Schema-Migration, Hotswap, Preset-System |
 | **[06-UI-UND-TOOLING.md](architecture/06-UI-UND-TOOLING.md)** | NodeFactories, VL-Integration, Undo-System, ImGui-Compositor-UI |
 | **[07-PROJEKTSTRUKTUR.md](architecture/07-PROJEKTSTRUKTUR.md)** | Source Generators, Verzeichnis-Layout, NuGet, Offene Punkte, Performance-Ziele |
+| **[08-LAYOUT-UND-INPUT.md](architecture/08-LAYOUT-UND-INPUT.md)** | Layout-Engine (Flexbox), LayoutConfig, ComputedLayout, InputRouting, Hit-Testing, IMeasurable |
+| **[OFFENE-FRAGEN.md](OFFENE-FRAGEN.md)** | Offene Design-Fragen, Brainstorming-Backlog, nächste Schritte |
 
 ---
 

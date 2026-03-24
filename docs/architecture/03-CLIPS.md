@@ -446,3 +446,83 @@ Edits <-------------+--- OSC/MIDI (gemappte Parameter)
 ```
 
 Alle Edits fliessen im selben Kreislauf. Egal ob ein Slider im UI bewegt wird, ein Clip ein Kind erzeugt, oder ein OSC-Controller einen Parameter aendert — der Mechanismus ist identisch.
+
+---
+
+## Drei Arten von State
+
+| Typ | Wo | Serialisiert | Lesbar von anderen | Beispiel |
+|-----|----|--------------|--------------------|---------|
+| **Persistent** | SceneNode Components | Ja | Ja (ISceneContext) | ClipParameters, LayerBlending, ClipLifetime |
+| **Transient** | SceneNode Components (Transient=true) | **Nein** | Ja (ISceneContext) | ComputedLayout, InputHit, ComputedBounds |
+| **Clip-intern** | VL Process Felder | Nein | Nein | GPU-Texture, Accumulation-Buffer, interne Counter |
+
+### Persistent State
+Components auf SceneNode — die Wahrheit. Fließen ins ShowFile, unterstützen Undo/Redo, Timeline-Keyframes, Presets.
+
+### Transient State
+Components mit `[SceneComponent(Transient = true)]` — leben im Graphen, sind über `ISceneContext` lesbar, aber werden nicht serialisiert. Für frame-synchrone Werte die von der Pipeline berechnet werden (Layout, Bounds, Hit-Testing, Sensor-Daten bei hoher Frequenz).
+
+### Clip-interner State
+Felder im VL Process — privat, nur der Clip selbst sieht sie. GPU-Textures, Accumulation-Buffer, geladene Daten, interne Counter. Werden von VLs Hotswap automatisch migriert.
+
+### Wann Transient vs. Channel?
+
+| Kriterium | Transient Component | VL Channel |
+|-----------|--------------------:|:-----------|
+| **Frequenz** | Hoch (60fps, Sensoren) | Niedrig (Events, Klicks) |
+| **Timing** | Frame-synchron | Reaktiv/asynchron |
+| **Zugriff** | ISceneContext (Pull) | Subscribe (Push) |
+| **Beispiele** | ComputedLayout, InputHit, SensorData | "App/Selection/PhotoId", Navigation-Bangs |
+| **Performance** | FlatStorage → SoA-Array | Observable-Notification |
+
+---
+
+## VL Channels als System-Pin
+
+`IChannelHub` wird als System-Pin erkannt und vom System gesetzt — wie `ISceneContext`:
+
+```
+Process "MyClip" : ITextureEffect
+  Update(
+    out Texture Output,
+    Texture Input,
+    IChannelHub Hub,           ← System-Pin, vom System gesetzt
+    ISceneContext Context,     ← System-Pin
+    float Activity,
+    float Intensity = 1.0)
+```
+
+### Channels für Inter-Clip-Kommunikation
+
+```
+Process "GridController" : ISceneLogic
+  Update(out Spread<SceneEdit> Edits, IChannelHub Hub, ...)
+  {
+    // Channel schreiben — alle Subscriber reagieren sofort
+    Hub.TryGetChannel("App/Selection/PhotoId").Object = "foto_002";
+    Hub.TryGetChannel("App/Navigation/GoDetail").Object = Unit.Default;  // Bang
+  }
+
+Process "PhotoViewer" : ITextureGenerator
+  Create(IChannelHub Hub)
+  {
+    // Einmalig subscriben — reaktiv, nicht polling
+    Hub.TryGetChannel("App/Selection/PhotoId")
+        .Subscribe(id => LoadPhoto((string)id));
+  }
+```
+
+### Channels für externe Bindings
+
+OSC, MIDI, Sensoren und UI-Elemente können direkt über Channels kommunizieren — ohne SceneEdits, ohne Components:
+
+```
+ChannelHub
+  ├── "App/Selection/PhotoId"      : string     ← Inter-Clip
+  ├── "App/Navigation/GoDetail"    : Unit        ← Bang-Event
+  ├── "OSC/Sensor/Zone_001"        : float       ← Externe Hardware
+  └── "MIDI/CC/01"                 : float       ← MIDI-Controller
+```
+
+Channels ersetzen NICHT das Component-System. Sie ergänzen es für den Teil der **nicht frame-synchron und nicht persistent** sein muss.

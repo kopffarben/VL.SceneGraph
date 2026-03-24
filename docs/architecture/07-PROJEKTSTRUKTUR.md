@@ -94,6 +94,9 @@ VL.SceneGraph/
 │   │   │   ├── SceneGraphEditing.cs         # ApplyEdits Extension Methods
 │   │   │   ├── ISceneClip.cs                # Marker-Interface fuer VL-Clip-Patches
 │   │   │   ├── ISceneContext.cs             # Read-only Model-Zugriff fuer Clips
+│   │   │   ├── ISceneLogic.cs               # Interface fuer logische Clip-Operationen
+│   │   │   ├── ISceneElement.cs             # Interface fuer visuelle Szenen-Elemente
+│   │   │   ├── IMeasurable.cs               # Interface fuer Content-Messung (Text, Bilder)
 │   │   │   ├── NodeHandle.cs                # Stabiler Verweis auf Nodes (ueberlebt Rebuilds)
 │   │   │   ├── Edge.cs                      # Gerichtete Kante mit EdgeType
 │   │   │   ├── IComponent.cs                # Basis-Interface fuer alle Components
@@ -170,6 +173,26 @@ VL.SceneGraph/
 │   │   │   ├── PatchRegistry.cs             # Schema-Snapshots + PersistentId-Mapping
 │   │   │   └── SchemaMigration.cs           # SchemaDiff + Auto-Migration
 │   │   │
+│   │   ├── Layout/
+│   │   │   ├── LayoutConfig.cs           # LayoutConfig + SizeValue + enums
+│   │   │   ├── ComputedLayout.cs         # Transient Component
+│   │   │   ├── ILayoutEngine.cs          # Austauschbares Interface
+│   │   │   ├── FlexLayoutEngine.cs       # Flexbox-Integration
+│   │   │   ├── LayoutPass.cs             # Pipeline-Pass
+│   │   │   └── Flexbox/                  # Migrierter Flexbox-Code (~6000 Zeilen)
+│   │   │       ├── Flex.cs
+│   │   │       ├── Flex.Layout.cs
+│   │   │       ├── Flex.Parser.cs
+│   │   │       ├── Node.cs
+│   │   │       ├── Node.Style.cs
+│   │   │       ├── Style.cs
+│   │   │       └── Utils.cs
+│   │   │
+│   │   ├── Input/
+│   │   │   ├── InputHit.cs               # Transient Component
+│   │   │   ├── InputRoutingPass.cs       # Bottom-up Hit-Testing
+│   │   │   └── InputConfig.cs            # Opt-in/out fuer Hit-Testing
+│   │   │
 │   │   └── VL/                              # VL-spezifische API
 │   │       ├── ComponentExtensions.cs       # Get/Set Extension Methods
 │   │       ├── TraversalExtensions.cs       # ForEach, Rewrite, FindAll, Fold
@@ -229,6 +252,26 @@ Das NuGet-Paket enthaelt sowohl die kompilierte C#-Assembly als auch die VL-Doku
 
 ---
 
+## Modulare Paketstruktur
+
+```
+NuGet Pakete:
+  VL.SceneGraph              ← Kern: Baum, Pipeline, Clips, Edits, Channels
+  VL.SceneGraph.Layout       ← Optional: LayoutConfig → Flexbox → ComputedLayout
+  VL.SceneGraph.Input        ← Optional: Hit-Testing, Gestures, InputHit
+  VL.SceneGraph.Compositor   ← Optional: TextureCompositor, BlendModes, StreamRouting
+```
+
+Dependencies:
+```
+VL.SceneGraph                → System.Collections.Immutable, VL.Core
+VL.SceneGraph.Layout         → VL.SceneGraph (Kern)
+VL.SceneGraph.Input          → VL.SceneGraph (Kern)
+VL.SceneGraph.Compositor     → VL.SceneGraph (Kern), VL.Stride
+```
+
+---
+
 ## Offene Punkte
 
 ### Noch zu designen / implementieren
@@ -240,7 +283,6 @@ Das NuGet-Paket enthaelt sowohl die kompilierte C#-Assembly als auch die VL-Doku
 5. **Keyframe-Kurven-Editor**: Bezier-Tangenten-Editing in ImGui
 6. **Performance-Profiling**: Welche Passes wie lange dauern, wo sind Bottlenecks
 7. **Error Recovery**: Was passiert wenn ein Clip-Patch crasht? Isolation?
-8. **Spread\<T\> vs ImmutableArray\<T\>**: Wo ist die Grenze zwischen VL-nativen Typen und C#-Typen?
 
 ### Performance-Ziele
 

@@ -95,6 +95,38 @@ public partial record LookAtConstraint(
     Vector3 UpVector);
 ```
 
+### Transient Components
+
+Components mit `Transient = true` leben im Graphen und sind über `ISceneContext` lesbar, werden aber **nicht serialisiert**. Sie dienen als frame-synchroner Runtime-State.
+
+```csharp
+[SceneComponent(Transient = true)]
+public partial record ComputedLayout(RectangleF Bounds, RectangleF GlobalBounds,
+    Vector2 ContentOffset, Vector2 ContentSize);
+
+[SceneComponent(Transient = true, FlatStorage = true)]
+public partial record InputHit(bool IsHit, bool IsDirectHit, bool IsChildHit,
+    string? HitChildId, Vector2 LocalPosition);
+
+[SceneComponent(Transient = true)]
+public partial record ComputedBounds(RectangleF LocalBounds, RectangleF GlobalBounds,
+    bool IsHitTestable);
+```
+
+Der Serializer filtert Transient Components automatisch:
+```csharp
+var persistentComponents = node.AllComponents
+    .Where(c => !ComponentRegistry.IsTransient(c.GetType()));
+```
+
+Transient Components eignen sich für:
+- Layout-Ergebnisse (ComputedLayout, ComputedBounds)
+- Input-State (InputHit)
+- Sensor-Daten bei hoher Frequenz (60fps)
+- Berechnete Pipeline-Werte die nicht persistiert werden müssen
+
+→ Siehe [03-CLIPS.md](03-CLIPS.md) für die Abgrenzung zu VL Channels.
+
 ### Component-Referenztabelle
 
 Kompakte Uebersicht aller Standard-Components. Detaillierte Beschreibungen in den jeweiligen Kapiteln.
@@ -138,8 +170,13 @@ Kompakte Uebersicht aller Standard-Components. Detaillierte Beschreibungen in de
 | `FeedbackLoop` | `bool UseFeedback, float FeedbackAmount, int DelayFrames` | -- |
 | `InstanceOf` | `string TemplateId` | -> unten, Abschnitt 3 (Templates) |
 | `VisibilityFlag` | `bool Visible` | -- [FlatStorage] |
+| **Transient (nicht serialisiert)** | | |
+| `ComputedLayout` | `RectangleF Bounds, RectangleF GlobalBounds, Vector2 ContentOffset, Vector2 ContentSize` | -> Pipeline [Transient] |
+| `InputHit` | `bool IsHit, bool IsDirectHit, bool IsChildHit, string? HitChildId, Vector2 LocalPosition` | -> Pipeline [Transient, FlatStorage] |
+| `ComputedBounds` | `RectangleF LocalBounds, RectangleF GlobalBounds, bool IsHitTestable` | -> Pipeline [Transient] |
 
 > **[FlatStorage]** = Component wird als SoA-Array im `FlatSceneGraph` materialisiert (Source-Generator).
+> **[Transient]** = Component wird nicht serialisiert, dient als frame-synchroner Runtime-State.
 
 ---
 

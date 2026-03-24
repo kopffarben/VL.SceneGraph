@@ -32,7 +32,11 @@
       "Bash(grep -n \"\\\\.NET 8\\\\|netcore8\\\\|net8\" \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\"/* -r)",
       "mcp__serena__search_for_pattern",
       "Bash(find D:_MBOX_CODE_packagesVL.SceneGraphsrcReferencesVL.StandardLibsVL.Core -name *ChannelHelper* -o -name *ChannelView*)",
-      "Bash(find D:/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/tixl -type d -name *ndo* -o -type d -name *ommand*)"
+      "Bash(find D:/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/tixl -type d -name *ndo* -o -type d -name *ommand*)",
+      "mcp__serena__find_file",
+      "Bash(find /d/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/tixl -type f -name *MIDI* -o -name *Midi*)",
+      "Bash(find /d/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/VL.StandardLibs -type f -name *.cs -exec grep -l \"Pointer\\\\|Pen\\\\|Stylus\\\\|Tablet\\\\|Pressure\" {})",
+      "Bash(grep -r \"PointerLocation\\\\|PointerDevice\\\\|IPointerDevice\" /d/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/VL.StandardLibs/VL.Stride --include=*.cs)"
     ]
   }
 }

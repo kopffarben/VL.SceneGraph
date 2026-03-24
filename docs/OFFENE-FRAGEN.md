@@ -6,12 +6,6 @@
 
 ## Priorität: Hoch
 
-### Input-Routing im Detail
-- Wie genau funktioniert Event-Bubbling? Brauchen wir Capture/Bubble-Phasen wie im DOM?
-- Wie werden Multi-Touch-Events geroutet (mehrere simultane Touch-Punkte)?
-- Gesture Recognition: Swipe, Pinch, Long-Press — wo lebt die Logik? (Pipeline-Pass oder Clip?)
-- Focus-Management: Welcher Node hat den Tastatur-Fokus? Tab-Reihenfolge?
-
 ### LayoutConfig API-Design
 - Wie mappt LayoutConfig auf Flexbox-Properties für den VL-User? (Node-Browser-Darstellung)
 - Brauchen wir Convenience-Factories? z.B. `LayoutConfig.Stack(Vertical, Gap: 8)`, `LayoutConfig.Fill()`
@@ -108,3 +102,11 @@
 | GPU Resource Lifecycle | Deferred Disposal: Clips disposen nach Buffer-Swap, TexturePool für Intermediates | [09-STRIDE-INTEGRATION.md](architecture/09-STRIDE-INTEGRATION.md) |
 | Compute im Graph | IComputeClip → ComputeBuffer → Render-Clip liest Buffer, CommandList synchron | [09-STRIDE-INTEGRATION.md](architecture/09-STRIDE-INTEGRATION.md) |
 | RenderFeature entfernt | Stride registriert Features statisch → Clips nutzen Renderer oder Entities statt | [09-STRIDE-INTEGRATION.md](architecture/09-STRIDE-INTEGRATION.md) |
+| Input-Provider als Clips | Alle Inputs (MIDI, OSC, Pen, Camera) sind ISceneClip — FSM-steuerbar, Inspector-konfigurierbar, Runtime-tauglich | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| Channels als Input-Bus | Alle Inputs → Channels, Clips subscriben via IChannelHub, kein spezielles Input-API | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| Hit-Testing | InputRoutingPass bottom-up, InputHit Transient Component mit Source/TouchId/Pressure | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| Focus-System | Focus/CurrentNodeId Channel, Klick setzt Fokus, Tab navigiert | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| InputMapping | InputMapEntry auf Clips, MIDI-Learn, ChannelPath → Parameter mit Remap/Smoothing | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| Channel-Write API | Kein hub.Write() — stattdessen channel.Object = value auf gecachten Referenzen | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| MIDI/OSC Dependencies | NAudio für MIDI, OscCore für OSC — nicht in VL.StandardLibs | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |
+| Pen/Stylus | Nicht in VL — WM_POINTER Custom Wrapper nötig | [10-INPUT-SYSTEM.md](architecture/10-INPUT-SYSTEM.md) |

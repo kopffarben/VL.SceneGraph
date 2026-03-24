@@ -1,0 +1,14 @@
+obj/
+.vs/
+
+# .v4p backup files
+*~.xml
+
+# Dynamic plugins .dll
+bin/
+
+.vl/
+/lib/
+# src/References/
+/tools/vvvv_gamma*/
+/tools/*.zip

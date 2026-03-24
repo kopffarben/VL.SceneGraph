@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(sln|csproj|vl\\)$\")",
+      "Bash(find /d/_MBOX/_CODE/_packages/VL.SceneGraph -maxdepth 2 -not -path */.* -type d)",
+      "Bash(grep -E \"\\\\.cs$\")",
+      "Bash(grep -E \"\\\\.\\(targets|props\\)$\")",
+      "Bash(xargs grep:*)",
+      "Bash(find D:/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/VL.StandardLibs/VL.Core/src -name *.cs -type f -exec grep -l \"Where\\\\|Filter\\\\|Enumerable\\\\|LINQ\" {})",
+      "Bash(2)",
+      "Bash(find D:_MBOX_CODE_packagesVL.SceneGraphsrc -name *.cs -type f -exec grep -l \"IHotSwappableEntryPoint\\\\|OnSwap\\\\|FromStateObject\" {})",
+      "Bash(find D:_MBOX_CODE_packagesVL.SceneGraphsrc -name *.cs -type f -exec grep -l \"Swap\\\\|swap\\\\|instance.*old\\\\|instance.*new\" {})",
+      "Bash(grep -r \"FromStateObject\\\\|GetStateObject\\\\|TryGetStateType\" D:_MBOX_CODE_packagesVL.SceneGraphsrc --include=*.cs)",
+      "Bash(find D:_MBOX_CODE_packagesVL.SceneGraphsrcReferencesVL.StandardLibsVL.Stride.Runtimesrc -name *.cs -type f -exec grep -l \"Swap\\\\|OnSwap\" {})",
+      "Bash(grep -r \"Utilities.Swap\\\\|ref.*back\\\\|ref.*front\" D:_MBOX_CODE_packagesVL.SceneGraphsrc --include=*.cs)",
+      "Bash(grep -r \"hotswap\\\\|hot.swap\\\\|hot-swap\\\\|HotSwap\" D:_MBOX_CODE_packagesVL.SceneGraphsrc --include=*.cs -B 2 -A 2)",
+      "Bash(grep -r 'interface IVLFactory' D:/_MBOX/_CODE/_packages/VL.SceneGraph/src/References/VL.StandardLibs/VL.Core/src --include=*.cs)",
+      "WebSearch",
+      "WebFetch(domain:www.nuget.org)",
+      "WebFetch(domain:github.com)",
+      "mcp__serena__list_dir",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__activate_project",
+      "mcp__serena__find_symbol",
+      "Bash(wc -l \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\\\\Src\"/*.cs)",
+      "Bash(grep -n \"MeasureFunc\\\\|MeasureFunction\" \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\\\\Src\"/*.cs)",
+      "Bash(grep -n \"delegate.*Measure\\\\|struct.*Measure\\\\|class.*Measure\" \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\\\\Src\"/*.cs)",
+      "Bash(grep -n \"aspect-ratio\\\\|AspectRatio\\\\|gap\\\\|Gap\" \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\\\\Src\"/*.cs)",
+      "Bash(grep -n \"ObjectPool\\\\|ArrayPool\\\\|allocation\\\\|alloc\" \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\\\\Src\"/*.cs)",
+      "Bash(git -C \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\" log --oneline)",
+      "Bash(git -C \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\" remote -v)",
+      "Bash(grep -n \"\\\\.NET 8\\\\|netcore8\\\\|net8\" \"D:\\\\_MBOX\\\\_CODE\\\\_packages\\\\VL.SceneGraph\\\\src\\\\References\\\\Flexbox\"/* -r)"
+    ]
+  }
+}

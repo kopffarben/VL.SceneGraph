@@ -1,0 +1,7 @@
+[submodule "src/References/VL.StandardLibs"]
+	path = src/References/VL.StandardLibs
+	url = git@github.com:vvvv/VL.StandardLibs.git
+	branch = main
+[submodule "src/References/Flexbox"]
+	path = src/References/Flexbox
+	url = https://github.com/ru-ace/Flexbox.git

@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="EKYvICxF27COKXc5f2ctJU" LanguageVersion="2025.7.1" Version="0.128">
+  <NugetDependency Id="NPSVUru9AmCLJkVVPwgw86" Location="VL.CoreLib" Version="2025.7.1" />
+  <Patch Id="Rg1XISaTBYlMV2FU55MOhQ">
+    <Canvas Id="F2p7Dsiu8cZOR51vfTclGA" DefaultCategory="Main" CanvasType="FullCategory">
+      <!--
+
+    ************************ MyRecord ************************
+
+-->
+      <Node Name="MyRecord" Bounds="444,271" Id="SEeVW6E6jOkLZwCgUlRJjT">
+        <p:NodeReference>
+          <Choice Kind="RecordDefinition" />
+        </p:NodeReference>
+        <Patch Id="LI3D5uhJJ3PLywU6C0F6hL">
+          <Canvas Id="OtYIqUyP3XyPPEJoFTqkuT" CanvasType="Group">
+            <Pad Id="TOdfngXLUfkLgb0uSZrzWo" SlotId="Lb4ygQuqotxPdSBJnIM6Bm" Bounds="532,290" />
+            <ControlPoint Id="JRdlj7LSe5JNPnDCqtXpEX" Bounds="532,260" />
+            <ControlPoint Id="MtFB9BxfwDOQa1hUwGt094" Bounds="532,320" />
+          </Canvas>
+          <Patch Id="LUHvEjgU8PyLTvwKy0HnO9" Name="Create">
+            <Pin Id="HarF9iVnEKvOv8T01sgTEV" Name="MyFloat" Kind="InputPin" />
+          </Patch>
+          <ProcessDefinition Id="Fswf7IQTsk1MhHNSik4g3X" IsHidden="true">
+            <Fragment Id="QQDBQJvDJ5kPBcGSQriUrs" Patch="LUHvEjgU8PyLTvwKy0HnO9" Enabled="true" />
+            <Fragment Id="EhgeUNOiGtTMEBOuwzBcrz" Patch="EzJzA956LWuL6pjDBoeK47" />
+          </ProcessDefinition>
+          <Slot Id="Lb4ygQuqotxPdSBJnIM6Bm" Name="MyFloat">
+            <p:Attributes>
+              <AttributeData>
+                <p:TypeReference LastCategoryFullName="VL.Core.EditorAttributes" LastDependency="VL.CoreLib.vl">
+                  <Choice Kind="TypeFlag" Name="CustomMetaDataAttribute" />
+                </p:TypeReference>
+                <p:Arguments>
+                  <AttributeArgument>
+                    <p:Value SerializedValue="MyKey">
+                      <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                        <Choice Kind="TypeFlag" Name="String" />
+                      </p:TypeAnnotation>
+                    </p:Value>
+                  </AttributeArgument>
+                  <AttributeArgument>
+                    <p:Value SerializedValue="MyValue">
+                      <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                        <Choice Kind="TypeFlag" Name="String" />
+                      </p:TypeAnnotation>
+                    </p:Value>
+                  </AttributeArgument>
+                </p:Arguments>
+              </AttributeData>
+              <AttributeData>
+                <p:TypeReference LastCategoryFullName="VL.Core.EditorAttributes" LastDependency="VL.CoreLib.vl">
+                  <Choice Kind="TypeFlag" Name="TagAttribute" />
+                </p:TypeReference>
+                <p:Arguments>
+                  <AttributeArgument>
+                    <p:Value SerializedValue="testtag">
+                      <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                        <Choice Kind="TypeFlag" Name="String" />
+                      </p:TypeAnnotation>
+                    </p:Value>
+                  </AttributeArgument>
+                </p:Arguments>
+              </AttributeData>
+            </p:Attributes>
+            <p:TypeAnnotation p:Type="TypeReference">
+              <Choice Kind="TypeFlag" Name="Float32" />
+            </p:TypeAnnotation>
+          </Slot>
+          <Link Id="SHKkbD1EaqlOWIPR14Hn8l" Ids="HarF9iVnEKvOv8T01sgTEV,JRdlj7LSe5JNPnDCqtXpEX" IsHidden="true" />
+          <Link Id="KPMcFXJGZyFMCFIFTsaMYU" Ids="JRdlj7LSe5JNPnDCqtXpEX,TOdfngXLUfkLgb0uSZrzWo" />
+          <Patch Id="EzJzA956LWuL6pjDBoeK47" Name="Split">
+            <Pin Id="RDiSnINwqbCQD8tSF3tL1e" Name="MyFloat" Kind="OutputPin" />
+          </Patch>
+          <Link Id="PqIsbcYza80OGLOI01CI39" Ids="MtFB9BxfwDOQa1hUwGt094,RDiSnINwqbCQD8tSF3tL1e" IsHidden="true" />
+          <Link Id="R43TIOAqAYEPfMDA1DcKzE" Ids="TOdfngXLUfkLgb0uSZrzWo,MtFB9BxfwDOQa1hUwGt094" />
+        </Patch>
+      </Node>
+      <!--
+
+    ************************ MyTestClass ************************
+
+-->
+      <Node Name="MyTestClass" Bounds="444,340" Id="CCsK7ereJ3QNbutsX95rnL">
+        <p:NodeReference>
+          <Choice Kind="ClassDefinition" />
+        </p:NodeReference>
+        <p:Interfaces>
+          <TypeReference LastCategoryFullName="Main" LastDependency="SampleRecordandClass.vl">
+            <Choice Kind="InterfaceTypeFlag" Name="MyCustomSlot" />
+          </TypeReference>
+        </p:Interfaces>
+        <Patch Id="IT8X3uZXXCUL6noE6AX2SK">
+          <Canvas Id="UO4HMevhdhzPObgyGZTTA0" CanvasType="Group" />
+          <Patch Id="Vq81jFQIeWcOXQFU8w7xip" Name="Create" />
+          <Patch Id="HvGPsMiQsQYNhOhGWW0SDK" Name="Update" />
+          <Patch Id="SU6wkZz1Jb0NkHI3n7ShdC" Name="OnActivation" />
+          <Patch Id="OEfvEEn0JiVMfEkS2Apvaq" Name="OnDeactivation" />
+          <!--
+
+    ************************  ************************
+
+-->
+          <ProcessDefinition Id="Rp6sHGOXbPVNB2S5wpZ2i4" IsHidden="true">
+            <Fragment Id="VhSI2MeoZJbNcaAes1e95a" Patch="Vq81jFQIeWcOXQFU8w7xip" Enabled="true" />
+            <Fragment Id="FqLUbkAzpQcOHJZDyrUOth" Patch="SU6wkZz1Jb0NkHI3n7ShdC" Enabled="true" />
+            <Fragment Id="NSgPP9qjyaGM38DNV5dDZh" Patch="HvGPsMiQsQYNhOhGWW0SDK" Enabled="true" />
+            <Fragment Id="MfaCNVXb5NLOir7PtY2rQv" Patch="OEfvEEn0JiVMfEkS2Apvaq" Enabled="true" />
+          </ProcessDefinition>
+          <Patch Id="PDKLfrTRCsXPWHe8xbDpnN" Name="Dispose" />
+        </Patch>
+      </Node>
+      <!--
+
+    ************************ MyCustomSlot ************************
+
+-->
+      <Node Name="MyCustomSlot" Bounds="444,390" Id="Ks3DYhvYG4SMQdYCFwtLnR">
+        <p:NodeReference>
+          <Choice Kind="InterfaceDefinition" />
+        </p:NodeReference>
+        <p:Interfaces>
+          <TypeReference LastCategoryFullName="Main" LastDependency="SampleProj.csproj">
+            <Choice Kind="MutableInterfaceType" Name="ISceneClip" />
+          </TypeReference>
+        </p:Interfaces>
+        <Patch Id="MTvpuUW5LpQPdBOJFAHXl8">
+          <Canvas Id="KBgrequk2pFO557ic0oohc" CanvasType="Group" />
+          <!--
+
+    ************************  ************************
+
+-->
+          <ProcessDefinition Id="EaWMpuvErZ2Pqip0NUb0U6" IsHidden="true" />
+        </Patch>
+      </Node>
+    </Canvas>
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="SqlmNF6xKBuLjplpZfhGnP">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <CategoryReference Kind="Category" Name="Primitive" />
+      </p:NodeReference>
+      <Patch Id="FQWRaeP7KkWM8ANB4e9gjQ">
+        <Canvas Id="JmlM5WHzh3TNXeXW2glH68" CanvasType="Group">
+          <Node Bounds="474,350,79,19" Id="AbaAqsCkWIDNBUGYBgi9Nn">
+            <p:NodeReference LastCategoryFullName="Main" LastDependency="KeepAppAlive.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="KeepAppAlive" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
+            <Pin Id="GIS57boZcujMwzOxDaGZ8m" Name="Node Context" Kind="InputPin" IsHidden="true" />
+            <Pin Id="TSt3gyV5dQmOXQ9qo3AGqT" Name="Is Alive" Kind="InputPin" />
+          </Node>
+        </Canvas>
+        <Patch Id="F9LJYph4a6lMa6AZFBXTmM" Name="Create" />
+        <Patch Id="JwcwZIq9F6qNKSW0tle0Al" Name="Update" />
+        <ProcessDefinition Id="PeFobQATz24MRlmihSsDoX">
+          <Fragment Id="Dp6P2lB9pVMLKXXAsXVJ0c" Patch="F9LJYph4a6lMa6AZFBXTmM" Enabled="true" />
+          <Fragment Id="KnVvPpA6Q0bOzXAarNCH6l" Patch="JwcwZIq9F6qNKSW0tle0Al" Enabled="true" />
+        </ProcessDefinition>
+      </Patch>
+    </Node>
+  </Patch>
+  <ProjectDependency Id="Vy9CQpzYkmwOXlk0dO2CbV" Location="./csharp/SampleProj/SampleProj.csproj" />
+</Document>

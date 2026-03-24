@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ]
+    },
+    "mcp-lsp-bridge": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-lsp-bridge",
+        "--",
+        "csharp-ls"
+      ]
+    }
+  }
+}

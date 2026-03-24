@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <OutputType>WinExe</OutputType>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishDir>..\..\SampleRecordandClass</PublishDir>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <ApplicationManifest>App.manifest</ApplicationManifest>
+    <ApplicationIcon>C:\Program Files\vvvv\vvvv_gamma_7.1-win-x64\Resources\icons\vvvv_MAINICON.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="D:\_MBOX\_CODE\_packages\VL.SceneGraph\RnD\SampleRecordandClass\presets\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>presets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </None>
+    <None Include="D:\_MBOX\_CODE\_packages\VL.SceneGraph\RnD\SampleRecordandClass\SampleRecordandClass.pc" Condition="Exists('D:\_MBOX\_CODE\_packages\VL.SceneGraph\RnD\SampleRecordandClass\SampleRecordandClass.pc')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>%(Filename)%(Extension)</Link>
+    </None>
+  </ItemGroup>
+  <Import Project="..\..\SampleRecordandClass.props" Condition="Exists('..\..\SampleRecordandClass.props')" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\csharp\SampleProj\SampleProj.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Stride.Core.Mathematics" />
+    <PackageReference Include="System.Interactive" />
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="System.Reactive" />
+    <PackageReference Include="VL.App.WindowsForms" />
+    <PackageReference Include="VL.CoreLib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="VL.CoreLib.vl" HintPath="C:\Program Files\vvvv\vvvv_gamma_7.1-win-x64\package-cache\VL.CoreLib.2025.7.1\VL.CoreLib.vl.dll" />
+    <Reference Include="VL.Serialization.Raw.vl" HintPath="C:\Program Files\vvvv\vvvv_gamma_7.1-win-x64\package-cache\VL.Serialization.Raw.2025.7.1\VL.Serialization.Raw.vl.dll" />
+  </ItemGroup>
+  <Target Name="AddAliases" BeforeTargets="ResolveReferences">
+    <ItemGroup>
+      <ReferencePath Condition="'%(FileName)'=='VL.AppServices'" Aliases="e2" />
+      <ReferencePath Condition="'%(FileName)'=='VL.CoreLib.vl'" Aliases="e211" />
+      <ReferencePath Condition="'%(FileName)'=='VL.CoreLib'" Aliases="e212" />
+      <ReferencePath Condition="'%(FileName)'=='VL.Core'" Aliases="e1" />
+      <ReferencePath Condition="'%(FileName)'=='System'" Aliases="e165" />
+      <ReferencePath Condition="'%(FileName)'=='Stride.Core.Mathematics'" Aliases="e5" />
+      <ReferencePath Condition="'%(FileName)'=='Microsoft.Extensions.DependencyInjection.Abstractions'" Aliases="e11" />
+      <ReferencePath Condition="'%(FileName)'=='Microsoft.Extensions.Configuration.Abstractions'" Aliases="e7" />
+      <ReferencePath Condition="'%(FileName)'=='Microsoft.Extensions.Configuration.Binder'" Aliases="e123" />
+      <ReferencePath Condition="'%(FileName)'=='Microsoft.Extensions.Primitives'" Aliases="e17" />
+      <ReferencePath Condition="'%(FileName)'=='netstandard'" Aliases="e14" />
+      <ReferencePath Condition="'%(FileName)'=='Microsoft.Extensions.Logging'" Aliases="e12" />
+      <ReferencePath Condition="'%(FileName)'=='Microsoft.Extensions.Logging.Abstractions'" Aliases="e4" />
+      <ReferencePath Condition="'%(FileName)'=='VL.Serialization.Raw.vl'" Aliases="e213" />
+      <ReferencePath Condition="'%(FileName)'=='VL.Serialization.Raw'" Aliases="e214" />
+      <ReferencePath Condition="'%(FileName)'=='SampleProj'" Aliases="e337" />
+    </ItemGroup>
+  </Target>
+  <Import Project="..\..\SampleRecordandClass.targets" Condition="Exists('..\..\SampleRecordandClass.targets')" />
+</Project>
